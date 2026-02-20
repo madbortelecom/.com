@@ -344,30 +344,125 @@
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, doc, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Setup
-     // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        import React, { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { getFirestore, collection, addDoc, onSnapshot } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// ১. আপনার ফায়ারবেস কনসোল থেকে এই তথ্যগুলো সংগ্রহ করুন
+// Project Settings > General > Your Apps সেকশনে এটি পাবেন
 const firebaseConfig = {
-  apiKey: "AIzaSyBF9bIxPQV4f5Su9WXoU3LqszlLQGG-9AY",
-  authDomain: "bondhon-ap.firebaseapp.com",
-  databaseURL: "https://bondhon-ap-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "bondhon-ap",
-  storageBucket: "bondhon-ap.firebasestorage.app",
-  messagingSenderId: "609168138421",
-  appId: "1:609168138421:web:19f8a69fba39f5c7c8defc",
-  measurementId: "G-KZQ6VGHFEF"
+  apiKey: "YOUR_NEW_API_KEY", // এখানে আপনার নতুন জেনারেট করা API Key দিন
+  authDomain: "your-app-id.firebaseapp.com",
+  projectId: "your-app-id",
+  storageBucket: "your-app-id.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef123456"
 };
 
-// Initialize Firebase
+// ২. ফায়ারবেস ইনিশিয়ালাইজেশন
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-        let members = [], payments = [];
+const auth = getAuth(app);
+const db = getFirestore(app);
 
+// ৩. আপনার অ্যাপ আইডি (এনভায়রনমেন্ট ভেরিয়েবল থেকে নিলে ভালো)
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'my-awesome-app';
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  // ৪. অথেন্টিকেশন হ্যান্ডলার
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        // যদি আপনার কাছে কাস্টম টোকেন থাকে তবে সেটি ব্যবহার করবে, নয়তো অ্যানোনিমাসলি লগইন হবে
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          // signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth Error:", error);
+      }
+    };
+
+    initAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ৫. ডেটা ফেচিং (Firestore)
+  useEffect(() => {
+    if (!user) return;
+
+    // রিলেশনশিপ মেইনটেইন করার জন্য সঠিক পাথ ব্যবহার করা জরুরি (Rule 1 অনুযায়ী)
+    const q = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMessages(data);
+    }, (error) => {
+      console.error("Firestore Error:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || !user) return;
+    
+    try {
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
+        text: inputValue,
+        timestamp: Date.now(),
+        userId: user.uid
+      });
+      setInputValue('');
+    } catch (error) {
+      console.error("Send Error:", error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 flex flex-col items-center">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-2xl font-bold mb-4 text-center text-blue-600">Firebase App</h1>
+        
+        <div className="mb-4 text-sm text-gray-500 text-center">
+          {user ? `Logged in as: ${user.uid}` : 'Connecting...'}
+        </div>
+
+        <div className="h-64 overflow-y-auto mb-4 border rounded p-2 bg-gray-50">
+          {messages.map((msg) => (
+            <div key={msg.id} className="mb-2 p-2 bg-blue-100 rounded">
+              {msg.text}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="flex-1 border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="Type something..."
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+      }
         window.openM = (id) => {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active-modal'));
             const modal = document.getElementById(id);
