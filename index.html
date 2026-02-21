@@ -96,7 +96,7 @@
                     <span class="text-[10px] mt-2 font-bold text-slate-400">Madbor Web</span>
                 </button>
                 
-                <a href="https://chat.whatsapp.com/YOUR_WHATSAPP_GROUP_LINK_HERE" target="_blank" class="flex flex-col items-center group">
+                <a href="https://chat.whatsapp.com/FiPELzitLDv5cqPTcblHwq?mode=gi_t" target="_blank" class="flex flex-col items-center group">
                     <div class="w-14 h-14 glass-card border-green-500/30 flex items-center justify-center text-2xl group-hover:scale-110 transition duration-300">💚</div>
                     <span class="text-[10px] mt-2 font-bold text-slate-400">WhatsApp Group</span>
                 </a>
@@ -331,16 +331,28 @@
     </div>
 
     <div id="contactModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('contactModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-6 text-center">আমাদের সাথে যোগাযোগ</h3>
-            <div class="space-y-4 text-center">
-                <p class="text-slate-400 text-sm">যেকোনো জিজ্ঞাসা বা পরামর্শের জন্য কল করুন।</p>
-                <div class="flex justify-center gap-4">
-                    <a href="tel:01754361490" class="w-12 h-12 glass-card flex items-center justify-center">📞</a>
-                    <a href="https://wa.me/8801754361490" target="_blank" class="w-12 h-12 glass-card flex items-center justify-center">💬</a>
-                </div>
+        <div class="max-w-md mx-auto mt-10 glass-card p-8 relative">
+            <button onclick="closeM('contactModal')" class="absolute top-4 right-4 text-xl">×</button>
+            <h3 class="text-2xl font-black mb-4 text-center text-blue-400">যোগাযোগ করুন</h3>
+            <p class="text-xs text-center text-slate-400 mb-6">আপনার যেকোনো প্রশ্ন বা সহায়তার জন্য ফর্মটি পূরণ করুন।</p>
+            
+            <form action="mailto:sksakibvai990@gmail.com" method="post" enctype="text/plain" class="space-y-4">
+                <input type="text" name="name" placeholder="আপনার নাম লিখুন" class="glass-input w-full p-4 rounded-xl" required>
+                <input type="email" name="email" placeholder="আপনার ইমেইল লিখুন" class="glass-input w-full p-4 rounded-xl" required>
+                <textarea name="message" rows="3" placeholder="আপনার বার্তা লিখুন" class="glass-input w-full p-4 rounded-xl" required></textarea>
+                <button type="submit" class="w-full btn-gradient py-3 rounded-xl font-bold">বার্তা পাঠান</button>
+            </form>
+
+            <div class="mt-8 space-y-3 text-sm text-slate-300 border-t border-white/10 pt-6">
+                <p><strong>📍 ঠিকানা:</strong> শিবচর, মাদারীপুর, ঢাকা, বাংলাদেশ</p>
+                <p><strong>📞 ফোন:</strong> 01754361490</p>
+                <p class="social flex gap-4 mt-2">
+                    <a href="#" class="text-blue-400 hover:underline">Facebook</a>
+                    <a href="#" class="text-red-400 hover:underline">YouTube</a>
+                </p>
             </div>
+            
+            <iframe class="mt-6 w-full h-40 rounded-xl" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58544.17544030634!2d90.1748261!3d23.3615598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x37550ca179469601%3A0xc6c769493f0b8756!2sShibchar!5e0!3m2!1sen!2sbd!4v1700000000000" allowfullscreen="" loading="lazy"></iframe>
         </div>
     </div>
     
@@ -353,28 +365,63 @@
     </div>
 
     <div id="teamsModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('teamsModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-6 text-center">আমাদের টিম</h3>
-            <div class="space-y-4">
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center text-xl">👨‍💼</div>
+        <div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[85vh] overflow-y-auto">
+            <button onclick="closeM('teamsModal')" class="absolute top-4 right-4 text-xl">×</button>
+            <h3 class="text-xl font-black mb-6 text-center text-blue-400">আমাদের পরিচালনা কমিটি</h3>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">👨‍💼</div>
                     <div>
-                        <h4 class="font-bold text-sm text-white">সভাপতি</h4>
-                        <p class="text-xs text-slate-400">নাম এখানে বসবে</p>
+                        <h4 class="font-bold text-sm">সভাপতি</h4>
+                        <p class="text-xs text-slate-400">মো: সিদ্দিকুর রহমান (+880 1798-631305)</p>
                     </div>
                 </div>
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-xl">👨‍⚖️</div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div>
                     <div>
-                        <h4 class="font-bold text-sm text-white">সাধারণ সম্পাদক</h4>
-                        <p class="text-xs text-slate-400">নাম এখানে বসবে</p>
+                        <h4 class="font-bold text-sm">সহ-সভাপতি</h4>
+                        <p class="text-xs text-slate-400">আবুল মাদবর (+880 1734-947744)</p>
                     </div>
                 </div>
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center text-xl">👨‍💻</div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div>
                     <div>
-                        <h4 class="font-bold text-sm text-white">কারিগরি সহায়তা (IT)</h4>
+                        <h4 class="font-bold text-sm">সহ-সভাপতি</h4>
+                        <p class="text-xs text-slate-400">বাবুল মাদবর</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div>
+                    <div>
+                        <h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4>
+                        <p class="text-xs text-slate-400">সোহাগ আহমেদ নাফি (+880 1791-119545)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div>
+                    <div>
+                        <h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4>
+                        <p class="text-xs text-slate-400">আসিফ মাদবর</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">🤝</div>
+                    <div>
+                        <h4 class="font-bold text-sm">সদস্য সমর্থক</h4>
+                        <p class="text-xs text-slate-400">ইয়ামিন মাদবর (+880 1943-278276)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">⚙️</div>
+                    <div>
+                        <h4 class="font-bold text-sm">সাইট পরিচালক</h4>
+                        <p class="text-xs text-slate-400">সাগর মাদবর (01760144245)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">💻</div>
+                    <div>
+                        <h4 class="font-bold text-sm">কারিগরি সহায়তা (IT)</h4>
                         <p class="text-xs text-slate-400">মাদবর টেলিকম</p>
                     </div>
                 </div>
@@ -502,7 +549,7 @@
         </button>
         <button onclick="openM('contactModal')" class="text-slate-500 flex flex-col items-center">
             <span class="text-xl">📞</span>
-            <span class="text-[9px] font-bold uppercase mt-1">সাপোর্ট</span>
+            <span class="text-[9px] font-bold uppercase mt-1">কন্টাক্ট</span>
         </button>
     </nav>
 
@@ -577,7 +624,7 @@
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 render();
             });
-            
+             
             // Sync Payments (Ordered by date descending)
             const paymentsQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), orderBy('date', 'desc'));
             onSnapshot(paymentsQuery, snap => {
@@ -616,7 +663,7 @@
             e.preventDefault();
             const btn = e.submitter;
             const memberPhone = document.getElementById('payMember').value;
-            
+             
             if(!memberPhone) {
                 alert('দয়া করে একজন সদস্য নির্বাচন করুন।');
                 return;
@@ -649,7 +696,7 @@
             const tbody = document.getElementById('member-table-body');
             const select = document.getElementById('payMember');
             const historyBox = document.getElementById('history-container');
-            
+             
             let tColl = 0, tDue = 0, tFund = 0;
             const currentSel = select.value;
             select.innerHTML = '<option value="">সদস্য সিলেক্ট করুন</option>';
@@ -668,7 +715,7 @@
                     const targetAmount = monthsElapsed * monthlyPlan;
                     const dueAmount = targetAmount - paid;
                     const dueMonthsCount = Math.max(0, Math.ceil(dueAmount / monthlyPlan));
-                    
+                     
                     // Update aggregate stats
                     tColl += paid; 
                     tFund += targetAmount; 
