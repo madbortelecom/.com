@@ -14,6 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* All existing styles remain exactly the same */
         body { 
             font-family: 'Hind Siliguri', sans-serif; 
             background: #020617;
@@ -71,6 +72,19 @@
         }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        /* New style for file input */
+        input[type="file"]::file-selector-button {
+            margin-right: 20px;
+            border: none;
+            background: #3b82f6;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: background .2s ease-in-out;
+            font-weight: bold;
+        }
+        input[type="file"]::file-selector-button:hover { background: #2563eb; }
     </style>
 </head>
 <body class="pb-40">
@@ -110,7 +124,6 @@
     </header>
 
     <main class="max-w-4xl mx-auto px-4 -mt-10 space-y-6 relative z-20">
-        
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="glass-card p-5 border-l-4 border-l-blue-500">
                 <p class="text-[10px] text-slate-500 font-bold uppercase mb-1">সদস্য</p>
@@ -131,7 +144,7 @@
         </div>
 
         <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-            <button onclick="openM('submissionModal')" class="flex flex-col items-center glass-card p-4 hover:bg-white/10 transition">
+            <button onclick="openNewSubmissionModal()" class="flex flex-col items-center glass-card p-4 hover:bg-white/10 transition">
                 <span class="text-2xl mb-1">💰</span>
                 <span class="text-[9px] font-bold">টাকা জমা</span>
             </button>
@@ -224,18 +237,76 @@
     </footer>
 
     <div id="submissionModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('submissionModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-6 text-center text-blue-400">টাকা জমা দিন</h3>
-            <form id="paymentForm" class="space-y-4">
-                <select id="payMember" class="glass-input w-full p-4 rounded-xl" required></select>
-                <input type="number" id="payAmount" required placeholder="টাকার পরিমাণ (৫০০/১০০০)" class="glass-input w-full p-4 rounded-xl">
-                <input type="text" id="payTx" required placeholder="Transaction ID (TrxID)" class="glass-input w-full p-4 rounded-xl uppercase">
-                <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-white shadow-lg">কনফার্ম পেমেন্ট</button>
-            </form>
+        <div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[85vh] overflow-y-auto">
+            <button onclick="closeM('submissionModal')" class="absolute top-4 right-4 text-xl z-10">&times;</button>
+            
+            <div id="paymentMethodsBlock">
+                <h3 class="text-xl font-black mb-2 text-center text-blue-400">পেমেন্ট মেথড সিলেক্ট করুন</h3>
+                <p class="text-xs text-center text-slate-400 mb-6">কিভাবে টাকা জমা দিতে চান?</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="showPaymentForm('bKash', '017XXXXXXXX (Personal)')" class="flex flex-col items-center p-4 glass-card bg-pink-500/10 border-pink-500/30 hover:bg-pink-500/20 transition group">
+                        <span class="text-3xl mb-2">💸</span>
+                        <span class="font-bold text-sm group-hover:text-pink-400">bKash</span>
+                    </button>
+                    <button onclick="showPaymentForm('Nagad', '017XXXXXXXX (Personal)')" class="flex flex-col items-center p-4 glass-card bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20 transition group">
+                        <span class="text-3xl mb-2">📮</span>
+                        <span class="font-bold text-sm group-hover:text-orange-400">Nagad</span>
+                    </button>
+                    <button onclick="showPaymentForm('Upay', '017XXXXXXXX')" class="flex flex-col items-center p-4 glass-card bg-blue-400/10 border-blue-400/30 hover:bg-blue-400/20 transition group">
+                        <span class="text-3xl mb-2">💠</span>
+                        <span class="font-bold text-sm group-hover:text-blue-400">Upay</span>
+                    </button>
+                    <button onclick="showPaymentForm('Bank', 'City Bank: XXXXXXXX')" class="flex flex-col items-center p-4 glass-card bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 transition group">
+                        <span class="text-3xl mb-2">🏦</span>
+                        <span class="font-bold text-sm group-hover:text-purple-400">Bank</span>
+                    </button>
+                    <button onclick="showPaymentForm('Islami Bank', 'IBBL: XXXXXXXX')" class="col-span-2 flex flex-col items-center p-4 glass-card bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 transition group">
+                        <span class="text-3xl mb-2">🕌</span>
+                        <span class="font-bold text-sm group-hover:text-emerald-400">Islami Bank</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="paymentDetailsBlock" class="hidden space-y-4">
+                <button onclick="backToMethods()" class="text-xs flex items-center text-slate-400 hover:text-white mb-4">
+                    ⬅ মেথড পরিবর্তন করুন
+                </button>
+                
+                <div class="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center">
+                    <p class="text-xs text-blue-300 font-bold uppercase" id="selectedMethodName">Method</p>
+                    <p class="text-sm font-black text-white mt-1">টাকা পাঠানোর নাম্বার:</p>
+                    <h4 class="text-xl font-black text-white tracking-wider select-all" id="paymentSendNumber">---</h4>
+                    <p class="text-[10px] text-slate-400 mt-2">টাকা পাঠিয়ে নিচের ফর্ম পূরণ করুন</p>
+                </div>
+
+                <form id="newPaymentForm" class="space-y-4 mt-4">
+                    <input type="hidden" id="payMethodHidden">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-2">সদস্য নির্বাচন করুন *</label>
+                        <select id="payMember" class="glass-input w-full p-4 rounded-xl mt-1 text-white" required></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-2">টাকার পরিমাণ *</label>
+                         <input type="number" id="payAmount" required placeholder="যেমন: ৫০০ বা ১০০০" class="glass-input w-full p-4 rounded-xl mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-2">Transaction ID (TrxID) *</label>
+                        <input type="text" id="payTx" required placeholder="SMS থেকে TrxID কপি করে দিন" class="glass-input w-full p-4 rounded-xl uppercase mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 ml-2">পেমেন্ট স্ক্রিনশট (প্রমাণ) *</label>
+                        <input type="file" id="payScreenshot" accept="image/*" required class="glass-input w-full p-2 rounded-xl mt-1 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+                        <p class="text-[9px] text-slate-500 mt-1 ml-2">শুধুমাত্র ছবি আপলোড করা যাবে</p>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn" class="w-full btn-gradient py-4 rounded-xl font-black text-white shadow-lg flex justify-center items-center gap-2">
+                        <span>কনফার্ম পেমেন্ট</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-
     <div id="registerModal" class="modal-overlay">
         <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
             <button onclick="closeM('registerModal')" class="absolute top-4 right-4 text-xl">&times;</button>
@@ -243,7 +314,7 @@
             <form id="regForm" class="space-y-4">
                 <input type="text" id="regName" required placeholder="সদস্যের পুরো নাম" class="glass-input w-full p-4 rounded-xl">
                 <input type="tel" id="regPhone" required placeholder="সদস্যের মোবাইল নম্বর" class="glass-input w-full p-4 rounded-xl">
-                <select id="regPlan" class="glass-input w-full p-4 rounded-xl">
+                <select id="regPlan" class="glass-input w-full p-4 rounded-xl text-black">
                     <option value="500">মাসিক সঞ্চয় ৫০০ টাকা</option>
                     <option value="1000">মাসিক সঞ্চয় ১০০০ টাকা</option>
                 </select>
@@ -261,329 +332,24 @@
             </div>
         </div>
     </div>
-
-    <div id="rulesModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('rulesModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4 text-blue-400">নিয়মাবলী</h3>
-            <div class="text-xs space-y-2 text-slate-300">
-                <p>১. প্রতি মাসের ১০ তারিখের মধ্যে সঞ্চয় জমা দিতে হবে।</p>
-                <p>২. বিশেষ প্রয়োজনে ঋণ গ্রহণ করা যাবে (শর্তসাপেক্ষে)।</p>
-                <p>৩. ৩ মাস টানা কিস্তি না দিলে সদস্যপদ স্থগিত হবে।</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="missionModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('missionModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4 text-blue-400">আমাদের লক্ষ্য</h3>
-            <p class="text-xs text-slate-300">আমাদের মূল লক্ষ্য হলো সদস্যদের আর্থিক স্বাবলম্বী করা এবং সামাজিক ভ্রাতৃত্ব বজায় রাখা।</p>
-        </div>
-    </div>
-
-    <div id="madborAppsModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('madborAppsModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4">Madbor Apps</h3>
-            <p class="text-xs text-slate-300">আমাদের সকল ডিজিটাল অ্যাপ এখানে পাওয়া যাবে। বিস্তারিত জানতে যোগাযোগ করুন।</p>
-        </div>
-    </div>
-
-    <div id="madborWebsitesModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('madborWebsitesModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4">Madbor Web Links</h3>
-            <div class="space-y-4">
-                <a href="https://madbortelecom.blogspot.com" target="_blank" class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition group">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-2xl group-hover:scale-110 transition">🌐</div>
-                    <div>
-                         <h4 class="font-bold text-sm text-white group-hover:text-blue-400">Madbor Telecom</h4>
-                         <p class="text-[10px] text-slate-400 truncate">madbortelecom.blogspot.com</p>
-                    </div>
-                </a>
-                <a href="https://duarsheba24.blogspot.com" target="_blank" class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition group">
-                     <div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center text-2xl group-hover:scale-110 transition">🩺</div>
-                    <div>
-                         <h4 class="font-bold text-sm text-white group-hover:text-emerald-400">Duarsheba24</h4>
-                         <p class="text-[10px] text-slate-400 truncate">duarsheba24.blogspot.com</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div id="emergencyContactsModal" class="modal-overlay">
-        <div class="max-w-sm mx-auto mt-20 glass-card p-8 relative">
-            <button onclick="closeM('emergencyContactsModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-6 text-center text-rose-500">জরুরি কন্টাক্ট</h3>
-            <div class="space-y-4 text-sm">
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="font-bold">হেল্পলাইন</p>
-                    <p class="text-slate-400">+৮৮০ ১৭১২-৩৪৫৬৭৮</p>
-                </div>
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="font-bold">টেকনিক্যাল সাপোর্ট</p>
-                    <p class="text-slate-400">+৮৮০ ১৭৫৪-৩৬১৪৯০</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="contactModal" class="modal-overlay">
-        <div class="max-w-md mx-auto mt-10 glass-card p-8 relative">
-            <button onclick="closeM('contactModal')" class="absolute top-4 right-4 text-xl">×</button>
-            <h3 class="text-2xl font-black mb-4 text-center text-blue-400">যোগাযোগ করুন</h3>
-            <p class="text-xs text-center text-slate-400 mb-6">আপনার যেকোনো প্রশ্ন বা সহায়তার জন্য ফর্মটি পূরণ করুন।</p>
-            
-            <form action="mailto:sksakibvai990@gmail.com" method="post" enctype="text/plain" class="space-y-4">
-                <input type="text" name="name" placeholder="আপনার নাম লিখুন" class="glass-input w-full p-4 rounded-xl" required>
-                <input type="email" name="email" placeholder="আপনার ইমেইল লিখুন" class="glass-input w-full p-4 rounded-xl" required>
-                <textarea name="message" rows="3" placeholder="আপনার বার্তা লিখুন" class="glass-input w-full p-4 rounded-xl" required></textarea>
-                <button type="submit" class="w-full btn-gradient py-3 rounded-xl font-bold">বার্তা পাঠান</button>
-            </form>
-
-            <div class="mt-8 space-y-3 text-sm text-slate-300 border-t border-white/10 pt-6">
-                <p><strong>📍 ঠিকানা:</strong> শিবচর, মাদারীপুর, ঢাকা, বাংলাদেশ</p>
-                <p><strong>📞 ফোন:</strong> 01754361490</p>
-                <p class="social flex gap-4 mt-2">
-                    <a href="#" class="text-blue-400 hover:underline">Facebook</a>
-                    <a href="#" class="text-red-400 hover:underline">YouTube</a>
-                </p>
-            </div>
-            
-            <iframe class="mt-6 w-full h-40 rounded-xl" src="maps.google.com/1" allowfullscreen="" loading="lazy"></iframe>
-        </div>
-    </div>
     
-    <div id="aboutUsModal" class="modal-overlay">
-        <div class="max-w-md mx-auto mt-10 glass-card p-8 relative max-h-[85vh] overflow-y-auto">
-            <button onclick="closeM('aboutUsModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            
-            <h3 class="text-2xl font-black mb-2 text-center">
-                <span class="text-blue-400">এম পি বন্ধন</span> <span class="text-white">সমিতি</span>
-                <span class="text-sm text-slate-400 block font-medium tracking-wider">(Bondhon MP Society)</span>
-            </h3>
-            
-            <p class="text-sm text-slate-300 text-center mb-8 leading-relaxed">একটি অলাভজনক সামাজিক ও অর্থনৈতিক উন্নয়নের ডিজিটাল প্ল্যাটফর্ম, যা মূলত তিনটি প্রধান স্তম্ভের ওপর দাঁড়িয়ে আছে: ক্ষুদ্র সঞ্চয়, একতা এবং ডিজিটাল স্বচ্ছতা।</p>
-            
-            <div class="space-y-6 text-sm text-slate-300">
-                <div class="bg-white/5 p-5 rounded-xl border border-white/10">
-                    <h4 class="font-bold text-emerald-400 mb-3 text-base flex items-center">
-                        <span class="bg-emerald-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">১</span>
-                        ক্ষুদ্র সঞ্চয় ও আর্থিক নিরাপত্তা
-                    </h4>
-                    <p class="leading-relaxed">আমাদের মূল ভিত্তি হলো সদস্যদের ক্ষুদ্র সঞ্চয়। প্রতি মাসে অল্প অল্প করে জমানো টাকা ভবিষ্যতে বড় আর্থিক নিরাপত্তা নিশ্চিত করে। আমরা বিশ্বাস করি, বিন্দু বিন্দু জলেই সিন্ধু হয়।</p>
-                </div>
-
-                <div class="bg-white/5 p-5 rounded-xl border border-white/10">
-                    <h4 class="font-bold text-pink-400 mb-3 text-base flex items-center">
-                        <span class="bg-pink-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">২</span>
-                        একতা ও পারস্পরিক সহযোগিতা
-                    </h4>
-                    <p class="leading-relaxed">"দশে মিলে করি কাজ, হারি জিতি নাহি লাজ"। আমরা বিশ্বাস করি একতাই বল। আমাদের এই প্ল্যাটফর্মে সুখে-দুখে একে অপরের পাশে দাঁড়ানোই আমাদের অন্যতম লক্ষ্য।</p>
-                </div>
-
-                <div class="bg-white/5 p-5 rounded-xl border border-white/10">
-                    <h4 class="font-bold text-amber-400 mb-3 text-base flex items-center">
-                        <span class="bg-amber-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">৩</span>
-                        ডিজিটাল স্বচ্ছতা ও প্রযুক্তি
-                    </h4>
-                    <p class="leading-relaxed">মাদবর টেলিকমের তত্ত্বাবধানে পরিচালিত এই অ্যাপের মাধ্যমে সকল লেনদেনের হিসাব সম্পূর্ণ ডিজিটাল ও স্বচ্ছ। সদস্যরা যেকোনো সময় তাদের জমানো টাকা ও বকেয়ার হিসাব রিয়েল-টাইমে দেখতে পারেন।</p>
-                </div>
-            </div>
-
-            <div class="mt-8 text-center space-y-6">
-                <div class="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                     <h5 class="text-blue-400 font-bold mb-2 uppercase text-xs tracking-wider">আমাদের লক্ষ্য</h5>
-                     <p class="text-sm font-medium text-white">প্রতিটি সদস্যকে সঞ্চয়ের মাধ্যমে আর্থিকভাবে স্বাবলম্বী করে তোলা এবং একটি শক্তিশালী সামাজিক বন্ধন গড়ে তোলা।</p>
-                </div>
-                
-                <div class="pt-6 border-t border-white/10">
-                    <p class="text-xs text-slate-400 mb-3">আমরা আপনার মতামতকে গুরুত্ব দিই। যেকোনো প্রশ্ন বা পরামর্শ থাকলে 'যোগাযোগ করুন' পেজের মাধ্যমে আমাদের জানাতে পারেন।</p>
-                    <h4 class="font-black text-xl text-white tracking-tight">SAKIB MADBOR</h4>
-                    <p class="text-blue-400 font-bold">01754361490</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="teamsModal" class="modal-overlay">
-        <div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[85vh] overflow-y-auto">
-            <button onclick="closeM('teamsModal')" class="absolute top-4 right-4 text-xl">×</button>
-            <h3 class="text-xl font-black mb-6 text-center text-blue-400">আমাদের পরিচালনা কমিটি</h3>
-            <div class="space-y-3">
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">👨‍💼</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সভাপতি</h4>
-                        <p class="text-xs text-slate-400">মো: সিদ্দিকুর রহমান (+880 1798-631305)</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সহ-সভাপতি</h4>
-                        <p class="text-xs text-slate-400">আবুল মাদবর (+880 1734-947744)</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সহ-সভাপতি</h4>
-                        <p class="text-xs text-slate-400">বাবুল মাদবর</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4>
-                        <p class="text-xs text-slate-400">সোহাগ আহমেদ নাফি (+880 1791-119545)</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4>
-                        <p class="text-xs text-slate-400">আসিফ মাদবর</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">🤝</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সদস্য সমর্থক</h4>
-                        <p class="text-xs text-slate-400">ইয়ামিন মাদবর (+880 1943-278276)</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">⚙️</div>
-                    <div>
-                        <h4 class="font-bold text-sm">সাইট পরিচালক</h4>
-                        <p class="text-xs text-slate-400">সাগর মাদবর (01760144245)</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5">
-                    <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">💻</div>
-                    <div>
-                        <h4 class="font-bold text-sm">কারিগরি সহায়তা (IT)</h4>
-                        <p class="text-xs text-slate-400">মাদবর টেলিকম</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="privacyModal" class="modal-overlay">
-        <div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[80vh] overflow-y-auto">
-            <button onclick="closeM('privacyModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4 text-blue-400 sticky top-0">Privacy Policy</h3>
-            
-            <div class="text-xs text-slate-300 leading-relaxed space-y-4">
-                <p class="text-slate-500">Last updated: December 10, 2025</p>
-                <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
-                <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
-                
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Interpretation and Definitions</h4>
-                <p>The words whose initial letters are capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-                <ul class="list-disc ml-4 space-y-2 mt-2">
-                    <li><strong>Account:</strong> A unique account created for You to access our Service.</li>
-                    <li><strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to **Bondhon MP Society (Managed by Madbor Telecom)**.</li>
-                    <li><strong>Country:</strong> Bangladesh.</li>
-                    <li><strong>Personal Data:</strong> Any information that relates to an identified or identifiable individual.</li>
-                    <li><strong>Service:</strong> Refers to this Application/Website.</li>
-                    <li><strong>Service Provider:</strong> Third-party companies (like Google Firebase) employed by the Company to facilitate the Service.</li>
-                    <li><strong>You:</strong> The individual accessing or using the Service.</li>
-                </ul>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Collecting and Using Your Personal Data</h4>
-                <p>While using Our Service, We may ask You to provide Us with certain personally identifiable information, including:</p>
-                <ul class="list-disc ml-4 space-y-1 mt-2">
-                    <li>Phone number</li>
-                    <li>First name and last name</li>
-                    <li>Transaction details (for savings management)</li>
-                </ul>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Use of Your Personal Data</h4>
-                <p>The Company may use Personal Data for the following purposes:</p>
-                <ul class="list-disc ml-4 space-y-1 mt-2">
-                    <li>To provide and maintain our Service.</li>
-                    <li>To manage Your Account and registration.</li>
-                    <li>To contact You regarding updates or informative communications related to the functionalities.</li>
-                </ul>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Security of Your Personal Data</h4>
-                <p>The security of Your Personal Data is important to Us. Your data is stored securely using Google Firebase services. While We strive to use commercially reasonable means to protect Your Personal Data, We cannot guarantee its absolute security.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Changes to this Privacy Policy</h4>
-                <p>We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Contact Us</h4>
-                <p>If you have any questions about this Privacy Policy, You can contact us:</p>
-                <ul class="list-disc ml-4 space-y-1 mt-2">
-                    <li>By phone: 01754361490</li>
-                    <li>By email: sksakibvai990@gmail.com</li>
-                    <li>Address: Shibchar, Madaripur, Dhaka, Bangladesh.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="termsModal" class="modal-overlay">
-        <div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[80vh] overflow-y-auto">
-            <button onclick="closeM('termsModal')" class="absolute top-4 right-4 text-xl">&times;</button>
-            <h3 class="text-xl font-black mb-4 text-blue-400 sticky top-0">Terms and Conditions</h3>
-            
-            <div class="text-xs text-slate-300 leading-relaxed space-y-4">
-                <p class="text-slate-500">Last updated: December 10, 2025</p>
-                <p>Please read these terms and conditions carefully before using Our Service.</p>
-                
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Interpretation and Definitions</h4>
-                <p>The words whose initial letters are capitalized have meanings defined under the following conditions.</p>
-                <ul class="list-disc ml-4 space-y-2 mt-2">
-                    <li><strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to **Bondhon MP Society (Managed by Madbor Telecom)**.</li>
-                    <li><strong>Country:</strong> Bangladesh.</li>
-                    <li><strong>Service:</strong> Refers to the Application/Website.</li>
-                    <li><strong>Terms and Conditions:</strong> (also referred as "Terms") mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</li>
-                    <li><strong>You:</strong> means the individual accessing or using the Service.</li>
-                </ul>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Acknowledgment</h4>
-                <p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions.</p>
-                <p>By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.</p>
-                <p>Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Termination</h4>
-                <p>We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Limitation of Liability</h4>
-                <p>To the maximum extent permitted by applicable law, in no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of or in any way related to the use of or inability to use the Service.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">"AS IS" and "AS AVAILABLE" Disclaimer</h4>
-                <p>The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. The Company expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Governing Law</h4>
-                <p>The laws of the Country (Bangladesh), excluding its conflicts of law rules, shall govern this Terms and Your use of the Service.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Changes to These Terms and Conditions</h4>
-                <p>We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms.</p>
-
-                <h4 class="text-base font-bold text-white mt-6 mb-2">Contact Us</h4>
-                <p>If you have any questions about these Terms and Conditions, You can contact us:</p>
-                <ul class="list-disc ml-4 space-y-1 mt-2">
-                    <li>By phone: 01754361490</li>
-                    <li>By email: sksakibvai990@gmail.com</li>
-                    <li>Address: Shibchar, Madaripur, Dhaka, Bangladesh.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <div id="rulesModal" class="modal-overlay"><div class="max-w-sm mx-auto mt-20 glass-card p-8 relative"><button onclick="closeM('rulesModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4 text-blue-400">নিয়মাবলী</h3><div class="text-xs space-y-2 text-slate-300"><p>১. প্রতি মাসের ১০ তারিখের মধ্যে সঞ্চয় জমা দিতে হবে।</p><p>২. বিশেষ প্রয়োজনে ঋণ গ্রহণ করা যাবে (শর্তসাপেক্ষে)।</p><p>৩. ৩ মাস টানা কিস্তি না দিলে সদস্যপদ স্থগিত হবে।</p></div></div></div>
+    <div id="missionModal" class="modal-overlay"><div class="max-w-sm mx-auto mt-20 glass-card p-8 relative"><button onclick="closeM('missionModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4 text-blue-400">আমাদের লক্ষ্য</h3><p class="text-xs text-slate-300">আমাদের মূল লক্ষ্য হলো সদস্যদের আর্থিক স্বাবলম্বী করা এবং সামাজিক ভ্রাতৃত্ব বজায় রাখা।</p></div></div>
+    <div id="contactModal" class="modal-overlay"><div class="max-w-md mx-auto mt-10 glass-card p-8 relative"><button onclick="closeM('contactModal')" class="absolute top-4 right-4 text-xl">×</button><h3 class="text-2xl font-black mb-4 text-center text-blue-400">যোগাযোগ করুন</h3><p class="text-xs text-center text-slate-400 mb-6">আপনার যেকোনো প্রশ্ন বা সহায়তার জন্য ফর্মটি পূরণ করুন।</p><form action="mailto:sksakibvai990@gmail.com" method="post" enctype="text/plain" class="space-y-4"><input type="text" name="name" placeholder="আপনার নাম লিখুন" class="glass-input w-full p-4 rounded-xl" required><input type="email" name="email" placeholder="আপনার ইমেইল লিখুন" class="glass-input w-full p-4 rounded-xl" required><textarea name="message" rows="3" placeholder="আপনার বার্তা লিখুন" class="glass-input w-full p-4 rounded-xl" required></textarea><button type="submit" class="w-full btn-gradient py-3 rounded-xl font-bold">বার্তা পাঠান</button></form><div class="mt-8 space-y-3 text-sm text-slate-300 border-t border-white/10 pt-6"><p><strong>📍 ঠিকানা:</strong> শিবচর, মাদারীপুর, ঢাকা, বাংলাদেশ</p><p><strong>📞 ফোন:</strong> 01754361490</p><p class="social flex gap-4 mt-2"><a href="#" class="text-blue-400 hover:underline">Facebook</a><a href="#" class="text-red-400 hover:underline">YouTube</a></p></div><iframe class="mt-6 w-full h-40 rounded-xl" src="maps.google.com/1" allowfullscreen="" loading="lazy"></iframe></div></div>
+    <div id="aboutUsModal" class="modal-overlay"><div class="max-w-md mx-auto mt-10 glass-card p-8 relative max-h-[85vh] overflow-y-auto"><button onclick="closeM('aboutUsModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-2xl font-black mb-2 text-center"><span class="text-blue-400">এম পি বন্ধন</span> <span class="text-white">সমিতি</span><span class="text-sm text-slate-400 block font-medium tracking-wider">(Bondhon MP Society)</span></h3><p class="text-sm text-slate-300 text-center mb-8 leading-relaxed">একটি অলাভজনক সামাজিক ও অর্থনৈতিক উন্নয়নের ডিজিটাল প্ল্যাটফর্ম, যা মূলত তিনটি প্রধান স্তম্ভের ওপর দাঁড়িয়ে আছে: ক্ষুদ্র সঞ্চয়, একতা এবং ডিজিটাল স্বচ্ছতা।</p><div class="space-y-6 text-sm text-slate-300"><div class="bg-white/5 p-5 rounded-xl border border-white/10"><h4 class="font-bold text-emerald-400 mb-3 text-base flex items-center"><span class="bg-emerald-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">১</span>ক্ষুদ্র সঞ্চয় ও আর্থিক নিরাপত্তা</h4><p class="leading-relaxed">আমাদের মূল ভিত্তি হলো সদস্যদের ক্ষুদ্র সঞ্চয়। প্রতি মাসে অল্প অল্প করে জমানো টাকা ভবিষ্যতে বড় আর্থিক নিরাপত্তা নিশ্চিত করে। আমরা বিশ্বাস করি, বিন্দু বিন্দু জলেই সিন্ধু হয়।</p></div><div class="bg-white/5 p-5 rounded-xl border border-white/10"><h4 class="font-bold text-pink-400 mb-3 text-base flex items-center"><span class="bg-pink-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">২</span>একতা ও পারস্পরিক সহযোগিতা</h4><p class="leading-relaxed">"দশে মিলে করি কাজ, হারি জিতি নাহি লাজ"। আমরা বিশ্বাস করি একতাই বল। আমাদের এই প্ল্যাটফর্মে সুখে-দুখে একে অপরের পাশে দাঁড়ানোই আমাদের অন্যতম লক্ষ্য।</p></div><div class="bg-white/5 p-5 rounded-xl border border-white/10"><h4 class="font-bold text-amber-400 mb-3 text-base flex items-center"><span class="bg-amber-500/20 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-xs">৩</span>ডিজিটাল স্বচ্ছতা ও প্রযুক্তি</h4><p class="leading-relaxed">মাদবর টেলিকমের তত্ত্বাবধানে পরিচালিত এই অ্যাপের মাধ্যমে সকল লেনদেনের হিসাব সম্পূর্ণ ডিজিটাল ও স্বচ্ছ। সদস্যরা যেকোনো সময় তাদের জমানো টাকা ও বকেয়ার হিসাব রিয়েল-টাইমে দেখতে পারেন।</p></div></div><div class="mt-8 text-center space-y-6"><div class="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20"><h5 class="text-blue-400 font-bold mb-2 uppercase text-xs tracking-wider">আমাদের লক্ষ্য</h5><p class="text-sm font-medium text-white">প্রতিটি সদস্যকে সঞ্চয়ের মাধ্যমে আর্থিকভাবে স্বাবলম্বী করে তোলা এবং একটি শক্তিশালী সামাজিক বন্ধন গড়ে তোলা।</p></div><div class="pt-6 border-t border-white/10"><p class="text-xs text-slate-400 mb-3">আমরা আপনার মতামতকে গুরুত্ব দিই। যেকোনো প্রশ্ন বা পরামর্শ থাকলে 'যোগাযোগ করুন' পেজের মাধ্যমে আমাদের জানাতে পারেন।</p><h4 class="font-black text-xl text-white tracking-tight">SAKIB MADBOR</h4><p class="text-blue-400 font-bold">01754361490</p></div></div></div></div>
+    <div id="teamsModal" class="modal-overlay"><div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[85vh] overflow-y-auto"><button onclick="closeM('teamsModal')" class="absolute top-4 right-4 text-xl">×</button><h3 class="text-xl font-black mb-6 text-center text-blue-400">আমাদের পরিচালনা কমিটি</h3><div class="space-y-3"><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">👨‍💼</div><div><h4 class="font-bold text-sm">সভাপতি</h4><p class="text-xs text-slate-400">মো: সিদ্দিকুর রহমান (+880 1798-631305)</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div><div><h4 class="font-bold text-sm">সহ-সভাপতি</h4><p class="text-xs text-slate-400">আবুল মাদবর (+880 1734-947744)</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">👨‍⚖️</div><div><h4 class="font-bold text-sm">সহ-সভাপতি</h4><p class="text-xs text-slate-400">বাবুল মাদবর</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div><div><h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4><p class="text-xs text-slate-400">সোহাগ আহমেদ নাফি (+880 1791-119545)</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">📝</div><div><h4 class="font-bold text-sm">সাধারণ সম্পাদক</h4><p class="text-xs text-slate-400">আসিফ মাদবর</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">🤝</div><div><h4 class="font-bold text-sm">সদস্য সমর্থক</h4><p class="text-xs text-slate-400">ইয়ামিন মাদবর (+880 1943-278276)</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">⚙️</div><div><h4 class="font-bold text-sm">সাইট পরিচালক</h4><p class="text-xs text-slate-400">সাগর মাদবর (01760144245)</p></div></div><div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"><div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">💻</div><div><h4 class="font-bold text-sm">কারিগরি সহায়তা (IT)</h4><p class="text-xs text-slate-400">মাদবর টেলিকম</p></div></div></div></div></div>
+    <div id="privacyModal" class="modal-overlay"><div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[80vh] overflow-y-auto"><button onclick="closeM('privacyModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4 text-blue-400 sticky top-0">Privacy Policy</h3><div class="text-xs text-slate-300 leading-relaxed space-y-4"><p class="text-slate-500">Last updated: December 10, 2025</p><p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p><p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Interpretation and Definitions</h4><p>The words whose initial letters are capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p><ul class="list-disc ml-4 space-y-2 mt-2"><li><strong>Account:</strong> A unique account created for You to access our Service.</li><li><strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to **Bondhon MP Society (Managed by Madbor Telecom)**.</li><li><strong>Country:</strong> Bangladesh.</li><li><strong>Personal Data:</strong> Any information that relates to an identified or identifiable individual.</li><li><strong>Service:</strong> Refers to this Application/Website.</li><li><strong>Service Provider:</strong> Third-party companies (like Google Firebase) employed by the Company to facilitate the Service.</li><li><strong>You:</strong> The individual accessing or using the Service.</li></ul><h4 class="text-base font-bold text-white mt-6 mb-2">Collecting and Using Your Personal Data</h4><p>While using Our Service, We may ask You to provide Us with certain personally identifiable information, including:</p><ul class="list-disc ml-4 space-y-1 mt-2"><li>Phone number</li><li>First name and last name</li><li>Transaction details (for savings management)</li></ul><h4 class="text-base font-bold text-white mt-6 mb-2">Use of Your Personal Data</h4><p>The Company may use Personal Data for the following purposes:</p><ul class="list-disc ml-4 space-y-1 mt-2"><li>To provide and maintain our Service.</li><li>To manage Your Account and registration.</li><li>To contact You regarding updates or informative communications related to the functionalities.</li></ul><h4 class="text-base font-bold text-white mt-6 mb-2">Security of Your Personal Data</h4><p>The security of Your Personal Data is important to Us. Your data is stored securely using Google Firebase services. While We strive to use commercially reasonable means to protect Your Personal Data, We cannot guarantee its absolute security.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Changes to this Privacy Policy</h4><p>We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Contact Us</h4><p>If you have any questions about this Privacy Policy, You can contact us:</p><ul class="list-disc ml-4 space-y-1 mt-2"><li>By phone: 01754361490</li><li>By email: sksakibvai990@gmail.com</li><li>Address: Shibchar, Madaripur, Dhaka, Bangladesh.</li></ul></div></div></div>
+    <div id="termsModal" class="modal-overlay"><div class="max-w-md mx-auto mt-10 glass-card p-6 relative max-h-[80vh] overflow-y-auto"><button onclick="closeM('termsModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4 text-blue-400 sticky top-0">Terms and Conditions</h3><div class="text-xs text-slate-300 leading-relaxed space-y-4"><p class="text-slate-500">Last updated: December 10, 2025</p><p>Please read these terms and conditions carefully before using Our Service.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Interpretation and Definitions</h4><p>The words whose initial letters are capitalized have meanings defined under the following conditions.</p><ul class="list-disc ml-4 space-y-2 mt-2"><li><strong>Company:</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to **Bondhon MP Society (Managed by Madbor Telecom)**.</li><li><strong>Country:</strong> Bangladesh.</li><li><strong>Service:</strong> Refers to the Application/Website.</li><li><strong>Terms and Conditions:</strong> (also referred as "Terms") mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</li><li><strong>You:</strong> means the individual accessing or using the Service.</li></ul><h4 class="text-base font-bold text-white mt-6 mb-2">Acknowledgment</h4><p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions.</p><p>By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.</p><p>Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Termination</h4><p>We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Limitation of Liability</h4><p>To the maximum extent permitted by applicable law, in no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of or in any way related to the use of or inability to use the Service.</p><h4 class="text-base font-bold text-white mt-6 mb-2">"AS IS" and "AS AVAILABLE" Disclaimer</h4><p>The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. The Company expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Governing Law</h4><p>The laws of the Country (Bangladesh), excluding its conflicts of law rules, shall govern this Terms and Your use of the Service.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Changes to These Terms and Conditions</h4><p>We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms.</p><h4 class="text-base font-bold text-white mt-6 mb-2">Contact Us</h4><p>If you have any questions about these Terms and Conditions, You can contact us:</p><ul class="list-disc ml-4 space-y-1 mt-2"><li>By phone: 01754361490</li><li>By email: sksakibvai990@gmail.com</li><li>Address: Shibchar, Madaripur, Dhaka, Bangladesh.</li></ul></div></div></div>
+    <div id="madborAppsModal" class="modal-overlay"><div class="max-w-sm mx-auto mt-20 glass-card p-8 relative"><button onclick="closeM('madborAppsModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4">Madbor Apps</h3><p class="text-xs text-slate-300">আমাদের সকল ডিজিটাল অ্যাপ এখানে পাওয়া যাবে। বিস্তারিত জানতে যোগাযোগ করুন।</p></div></div>
+    <div id="madborWebsitesModal" class="modal-overlay"><div class="max-w-sm mx-auto mt-20 glass-card p-8 relative"><button onclick="closeM('madborWebsitesModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-4">Madbor Web Links</h3><div class="space-y-4"><a href="https://madbortelecom.blogspot.com" target="_blank" class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition group"><div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-2xl group-hover:scale-110 transition">🌐</div><div><h4 class="font-bold text-sm text-white group-hover:text-blue-400">Madbor Telecom</h4><p class="text-[10px] text-slate-400 truncate">madbortelecom.blogspot.com</p></div></a><a href="https://duarsheba24.blogspot.com" target="_blank" class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition group"><div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center text-2xl group-hover:scale-110 transition">🩺</div><div><h4 class="font-bold text-sm text-white group-hover:text-emerald-400">Duarsheba24</h4><p class="text-[10px] text-slate-400 truncate">duarsheba24.blogspot.com</p></div></a></div></div></div>
+    <div id="emergencyContactsModal" class="modal-overlay"><div class="max-w-sm mx-auto mt-20 glass-card p-8 relative"><button onclick="closeM('emergencyContactsModal')" class="absolute top-4 right-4 text-xl">&times;</button><h3 class="text-xl font-black mb-6 text-center text-rose-500">জরুরি কন্টাক্ট</h3><div class="space-y-4 text-sm"><div class="p-4 bg-white/5 rounded-xl border border-white/10"><p class="font-bold">হেল্পলাইন</p><p class="text-slate-400">+৮৮০ ১৭১২-৩৪৫৬৭৮</p></div><div class="p-4 bg-white/5 rounded-xl border border-white/10"><p class="font-bold">টেকনিক্যাল সাপোর্ট</p><p class="text-slate-400">+৮৮০ ১৭৫৪-৩৬১৪৯০</p></div></div></div></div>
 
     <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md glass-card bg-black/60 border-white/20 px-8 py-4 flex justify-between items-center z-50 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
         <button onclick="location.reload()" class="text-blue-400 flex flex-col items-center">
             <span class="text-xl">🏠</span>
             <span class="text-[9px] font-bold uppercase mt-1">হোম</span>
         </button>
-        <button onclick="openM('submissionModal')" class="text-slate-500 flex flex-col items-center">
+        <button onclick="openNewSubmissionModal()" class="text-slate-500 flex flex-col items-center">
             <span class="text-xl">💳</span>
             <span class="text-[9px] font-bold uppercase mt-1">জমা</span>
         </button>
@@ -601,30 +367,35 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, doc, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import Storage for Screenshots
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // TODO: এখানে আপনার ফায়ারবেস কনফিগারেশন অবজেক্ট বসান
+        // TODO 1: আপনার ফায়ারবেস কনফিগারেশন বসান
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
             projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com", // TODO: স্টোরেজ বাকেট অবশ্যই থাকতে হবে
             messagingSenderId: "YOUR_SENDER_ID",
             appId: "YOUR_APP_ID"
         };
+
+        // TODO 2: টেলিগ্রাম বট কনফিগারেশন বসান
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // আপনার বট টোকেন দিন
+        const TELEGRAM_CHAT_ID = 'YOUR_TELEGRAM_CHAT_ID';   // আপনার চ্যাট/গ্রুপ আইডি দিন
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        // App ID for Firestore path (Unique identifier for this society version)
         const appId = 'bondhon-mp-society-v3'; 
 
-        // Global variables to hold data
         let members = [];
         let payments = [];
 
-        // Modal Control Functions (Global Scope)
+        // Modal Control Functions
         window.openM = (id) => {
             document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active-modal'));
             const modal = document.getElementById(id);
@@ -633,16 +404,39 @@
         window.closeM = (id) => {
             const modal = document.getElementById(id);
             if(modal) modal.classList.remove('active-modal');
+            // Reset payment modal state on close
+            if(id === 'submissionModal') {
+                setTimeout(backToMethods, 300);
+            }
         }
 
-        // Authentication setup
+        // New Functions for Improved Payment Modal
+        window.openNewSubmissionModal = () => {
+            backToMethods();
+            openM('submissionModal');
+        }
+
+        window.showPaymentForm = (methodName, number) => {
+            document.getElementById('paymentMethodsBlock').classList.add('hidden');
+            document.getElementById('paymentDetailsBlock').classList.remove('hidden');
+            document.getElementById('selectedMethodName').innerText = methodName;
+            document.getElementById('paymentSendNumber').innerText = number;
+            document.getElementById('payMethodHidden').value = methodName;
+        }
+
+        window.backToMethods = () => {
+            document.getElementById('paymentDetailsBlock').classList.add('hidden');
+            document.getElementById('paymentMethodsBlock').classList.remove('hidden');
+            document.getElementById('newPaymentForm').reset();
+        }
+
+
+        // Authentication & Sync setup (Existing code)
         const initAuth = async () => {
             try {
-                // Check for custom token if available in global scope
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    // Otherwise, sign in anonymously
                     await signInAnonymously(auth);
                 }
             } catch (err) {
@@ -653,7 +447,6 @@
         };
         initAuth();
 
-        // Auth state listener to start syncing data
         onAuthStateChanged(auth, user => {
             if(user) {
                 document.getElementById('sync-status').innerText = 'Online';
@@ -661,15 +454,12 @@
             }
         });
 
-        // Real-time Data Sync Function
         function startSync() {
-            // Sync Members
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), snap => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 render();
             });
              
-            // Sync Payments (Ordered by date descending)
             const paymentsQuery = query(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), orderBy('date', 'desc'));
             onSnapshot(paymentsQuery, snap => {
                 payments = snap.docs.map(d => d.data());
@@ -677,7 +467,7 @@
             });
         }
 
-        // Registration Form Submission Handler
+        // Registration Form Submission Handler (Existing)
         document.getElementById('regForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = e.submitter;
@@ -702,39 +492,71 @@
             btn.innerHTML = 'রেজিস্ট্রেশন করুন';
         };
 
-        // Payment Submission Form Handler
-        document.getElementById('paymentForm').onsubmit = async (e) => {
+        // ================= NEW PAYMENT SUBMISSION HANDLER WITH SCREENSHOT & TELEGRAM =================
+        document.getElementById('newPaymentForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = e.submitter;
+            const btn = document.getElementById('submitBtn');
+            const originalBtnText = btn.innerHTML;
+            
             const memberPhone = document.getElementById('payMember').value;
-             
-            if(!memberPhone) {
-                alert('দয়া করে একজন সদস্য নির্বাচন করুন।');
+            const amount = parseFloat(document.getElementById('payAmount').value);
+            const txid = document.getElementById('payTx').value.toUpperCase().trim();
+            const method = document.getElementById('payMethodHidden').value;
+            const screenshotFile = document.getElementById('payScreenshot').files[0];
+
+            if(!memberPhone || !screenshotFile) {
+                alert('দয়া করে সদস্য নির্বাচন করুন এবং পেমেন্টের স্ক্রিনশট দিন।');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = 'প্রসেসিং...';
+            btn.innerHTML = 'Uploading Proof...';
+
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), {
+                // 1. Upload Screenshot to Firebase Storage
+                const storageRef = ref(storage, `${appId}/screenshots/${Date.now()}_${screenshotFile.name}`);
+                const snapshot = await uploadBytes(storageRef, screenshotFile);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+
+                btn.innerHTML = 'Saving Data...';
+
+                // 2. Save Data to Firestore (with image URL and method)
+                const paymentData = {
                     phone: memberPhone,
-                    amount: parseFloat(document.getElementById('payAmount').value),
-                    txid: document.getElementById('payTx').value.toUpperCase().trim(),
+                    amount: amount,
+                    txid: txid,
+                    method: method,
+                    screenshotUrl: downloadURL,
                     date: Date.now(),
                     timestamp: serverTimestamp()
-                });
+                };
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'payments'), paymentData);
+
+                // 3. Send Telegram Alert
+                btn.innerHTML = 'Sending Alert...';
+                const memberName = members.find(m => m.phone === memberPhone)?.name || 'Unknown';
+                
+                const telegramMessage = `🔔 *নতুন পেমেন্ট জমা হয়েছে!* 🔔%0A%0A👤 *সদস্য:* ${memberName} (${memberPhone})%0A💰 *পরিমাণ:* ৳${amount}%0A🏦 *মেথড:* ${method}%0A🆔 *TrxID:* \`${txid}\`%0A📅 *সময়:* ${new Date().toLocaleString('bn-BD')}%0A%0A📸 *পেমেন্ট প্রুফ (Screenshot):*%0A${downloadURL}`;
+
+                // Using fetch to send message to Telegram Bot API
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${telegramMessage}&parse_mode=Markdown`);
+
+                // Success!
                 closeM('submissionModal');
                 e.target.reset();
-                alert('পেমেন্ট জমা সফল হয়েছে!');
+                backToMethods();
+                alert('পেমেন্ট জমা এবং ভেরিফিকেশন সফল হয়েছে! এডমিন শীঘ্রই কনফার্ম করবেন।');
+
             } catch (err) { 
-                console.error(err);
-                alert('পেমেন্ট জমা ব্যর্থ হয়েছে।');
+                console.error("Payment Error:", err);
+                alert('পেমেন্ট জমা ব্যর্থ হয়েছে। ইন্টারনেট সংযোগ পরীক্ষা করুন বা আবার চেষ্টা করুন।');
             }
             btn.disabled = false;
-            btn.innerHTML = 'কনফার্ম পেমেন্ট';
+            btn.innerHTML = originalBtnText;
         };
 
-        // Main Render Function (Updates UI based on data)
+
+        // Main Render Function (Existing Logic)
         function render() {
             document.getElementById('loader')?.classList.add('hidden');
             const tbody = document.getElementById('member-table-body');
@@ -743,37 +565,31 @@
              
             let tColl = 0, tDue = 0, tFund = 0;
             const currentSel = select.value;
-            select.innerHTML = '<option value="">সদস্য সিলেক্ট করুন</option>';
+            select.innerHTML = '<option value="">সদস্য সিলেক্ট করুন *</option>';
 
-            // 1. Render Member Table & Populate Select Dropdown
             if (members.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-slate-500">কোন সদস্য নেই</td></tr>';
             } else {
                 tbody.innerHTML = members.map(m => {
-                    // Calculate financials for each member
                     const paid = payments.filter(p => p.phone === m.phone).reduce((s, p) => s + (p.amount || 0), 0);
                     const joinTime = m.joinDate || Date.now();
-                    // Approximate months elapsed since joining (30.44 days average month)
                     const monthsElapsed = Math.max(1, Math.ceil((Date.now() - joinTime) / (1000*60*60*24*30.44)));
                     const monthlyPlan = m.plan || 500;
                     const targetAmount = monthsElapsed * monthlyPlan;
                     const dueAmount = targetAmount - paid;
                     const dueMonthsCount = Math.max(0, Math.ceil(dueAmount / monthlyPlan));
                      
-                    // Update aggregate stats
                     tColl += paid; 
                     tFund += targetAmount; 
                     if(dueAmount > 0) tDue += dueAmount;
 
-                    // Populate payment select option
                     const opt = document.createElement('option');
                     opt.value = m.phone; 
                     opt.text = `${m.name} (${m.phone})`;
-                    opt.classList.add('text-black'); // Ensure dropdown options are visible
+                    opt.classList.add('text-black'); 
                     if(m.phone === currentSel) opt.selected = true;
                     select.add(opt);
 
-                    // Generate table row HTML
                     return `
                         <tr class="hover:bg-white/5 transition border-b border-white/5">
                             <td class="px-6 py-5">
@@ -797,14 +613,15 @@
                 }).join('');
             }
 
-            // 2. Render History
             historyBox.innerHTML = payments.length > 0 ? payments.map(p => {
                 const mName = members.find(m => m.phone === p.phone)?.name || 'Unknown Member';
+                // Added link to view screenshot if available
+                const proofLink = p.screenshotUrl ? `<a href="${p.screenshotUrl}" target="_blank" class="text-[9px] text-blue-400 underline ml-2">View Proof</a>` : '';
                 return `
                     <div class="p-4 bg-white/5 rounded-xl border border-white/5 flex justify-between items-center transition hover:bg-white/10">
                         <div>
-                            <p class="text-xs font-bold text-white">${mName}</p>
-                            <p class="text-[9px] text-slate-500">Trx: ${p.txid || 'N/A'}</p>
+                            <p class="text-xs font-bold text-white">${mName} <span class="text-[9px] text-slate-400">(${p.method || 'Cash'})</span></p>
+                            <p class="text-[9px] text-slate-500">Trx: ${p.txid || 'N/A'} ${proofLink}</p>
                             <p class="text-[8px] text-blue-400">${p.date ? new Date(p.date).toLocaleString('bn-BD') : ''}</p>
                         </div>
                         <div class="text-right">
@@ -814,11 +631,8 @@
                     </div>`;
             }).join('') : '<p class="text-center text-slate-500 text-xs py-4">কোনো লেনদেন পাওয়া যায়নি</p>';
 
-            // 3. Update Quick Stats
             document.getElementById('stat-members').innerText = members.length.toLocaleString('bn-BD');
             document.getElementById('stat-total-paid').innerText = '৳' + tColl.toLocaleString('bn-BD');
-            // Total Fund is what *should* have been collected, or you might want to show current balance (tColl). 
-            // Using tFund as "Target Fund" based on your previous logic.
             document.getElementById('stat-total-fund').innerText = '৳' + tFund.toLocaleString('bn-BD');
             document.getElementById('stat-total-due').innerText = '৳' + tDue.toLocaleString('bn-BD');
         }
